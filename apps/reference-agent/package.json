@@ -5,9 +5,10 @@
   "type": "module",
   "description": "Local-only Reference Agent experiment for the first professional-collaboration scenario.",
   "scripts": {
-    "build": "tsc -p tsconfig.json",
-    "typecheck": "tsc -p tsconfig.test.json",
-    "test": "vitest run",
+    "build:dependencies": "pnpm --filter @handshake/hsp-contracts build",
+    "build": "pnpm build:dependencies && tsc -p tsconfig.json",
+    "typecheck": "pnpm build:dependencies && tsc -p tsconfig.test.json",
+    "test": "pnpm build:dependencies && vitest run",
     "start": "node dist/main.js"
   },
   "dependencies": {
