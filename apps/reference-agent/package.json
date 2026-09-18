@@ -1,0 +1,16 @@
+{
+  "name": "@handshake/reference-agent",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Local-only Reference Agent experiment for the first professional-collaboration scenario.",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.test.json",
+    "test": "vitest run",
+    "start": "node dist/main.js"
+  },
+  "dependencies": {
+    "@handshake/hsp-contracts": "workspace:*"
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://handshake.cn/hsp/0.2/hsp-error.schema.json",
+  "title": "HSP protocol error",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["code", "message", "retryable"],
+  "properties": {
+    "code": {
+      "enum": [
+        "INVALID_SCHEMA",
+        "UNSUPPORTED_PROTOCOL_VERSION",
+        "INVALID_SIGNATURE",
+        "MESSAGE_EXPIRED",
+        "REPLAY_DETECTED",
+        "INVALID_STATE",
+        "CONCURRENT_MODIFICATION",
+        "BUDGET_EXHAUSTED",
+        "POLICY_BLOCKED",
+        "OWNER_AUTHORIZATION_REQUIRED",
+        "ENDPOINT_UNAVAILABLE",
+        "AUTHENTICATION_FAILED",
+        "PERMISSION_DENIED",
+        "RATE_LIMITED",
+        "INTERNAL_ERROR"
+      ]
+    },
+    "message": { "type": "string", "minLength": 1, "maxLength": 500 },
+    "retryable": { "type": "boolean" },
+    "message_id": { "type": "string", "pattern": "^msg_[A-Za-z0-9_-]{1,120}$" },
+    "handshake_id": { "type": "string", "pattern": "^hs_[A-Za-z0-9_-]{1,120}$" },
+    "details": {
+      "type": "object",
+      "maxProperties": 32,
+      "additionalProperties": true
+    }
+  }
+}

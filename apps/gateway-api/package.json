@@ -1,0 +1,22 @@
+{
+  "name": "@handshake/gateway-api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Small HTTP Gateway used to validate the HSP persistence vertical slice.",
+  "scripts": {
+    "build:dependencies": "pnpm --filter @handshake/application build && pnpm --filter @handshake/sqlite-store build",
+    "build": "pnpm build:dependencies && tsc -p tsconfig.json",
+    "typecheck": "pnpm build:dependencies && tsc -p tsconfig.test.json",
+    "test": "pnpm build:dependencies && pnpm --filter @handshake/protocol-simulator build && vitest run",
+    "start": "node dist/main.js"
+  },
+  "dependencies": {
+    "@handshake/application": "workspace:*",
+    "@handshake/domain": "workspace:*",
+    "@handshake/sqlite-store": "workspace:*"
+  },
+  "devDependencies": {
+    "@handshake/protocol-simulator": "workspace:*"
+  }
+}

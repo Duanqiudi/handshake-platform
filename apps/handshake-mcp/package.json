@@ -1,0 +1,19 @@
+{
+  "name": "@handshake/mcp-adapter",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Privacy-bounded MCP adapter for the Handshake member API.",
+  "bin": {
+    "handshake-mcp": "dist/main.js"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.test.json",
+    "test": "vitest run",
+    "start": "node dist/main.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.30.0"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "name": "@handshake/product-core",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Pure V1 product entities, validation, matching, consent, and seven-day project rules.",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.test.json",
+    "test": "vitest run"
+  }
+}

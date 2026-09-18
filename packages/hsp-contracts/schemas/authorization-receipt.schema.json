@@ -1,0 +1,56 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://handshake.cn/hsp/0.2/authorization-receipt.schema.json",
+  "title": "HSP 0.2 Authorization Receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "receipt_id",
+    "owner_binding",
+    "endpoint_id",
+    "claim_digest",
+    "purpose",
+    "recipient_endpoint_id",
+    "scene",
+    "consent_version",
+    "issued_at",
+    "expires_at",
+    "revoked",
+    "signature"
+  ],
+  "properties": {
+    "schema_version": { "const": "authorization-receipt-0.2" },
+    "receipt_id": { "type": "string", "pattern": "^auth_[A-Za-z0-9_-]{1,120}$" },
+    "owner_binding": { "type": "string", "minLength": 3, "maxLength": 128 },
+    "endpoint_id": { "$ref": "hsp-common.schema.json#/$defs/entityId" },
+    "claim_digest": { "$ref": "hsp-common.schema.json#/$defs/digest" },
+    "purpose": { "$ref": "hsp-common.schema.json#/$defs/purpose" },
+    "recipient_endpoint_id": { "$ref": "hsp-common.schema.json#/$defs/entityId" },
+    "scene": { "$ref": "hsp-common.schema.json#/$defs/scene" },
+    "consent_version": { "type": "string", "minLength": 1, "maxLength": 64 },
+    "issued_at": { "type": "string", "format": "date-time" },
+    "expires_at": { "type": "string", "format": "date-time" },
+    "revoked": { "type": "boolean" },
+    "revoked_at": { "type": "string", "format": "date-time" },
+    "signature": { "$ref": "hsp-common.schema.json#/$defs/signature" }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "revoked": { "const": true } },
+        "required": ["revoked"]
+      },
+      "then": {
+        "properties": { "revoked_at": { "type": "string", "format": "date-time" } },
+        "required": ["revoked_at"]
+      },
+      "else": {
+        "not": {
+          "properties": { "revoked_at": { "type": "string" } },
+          "required": ["revoked_at"]
+        }
+      }
+    }
+  ]
+}

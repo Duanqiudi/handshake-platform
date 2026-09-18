@@ -1,0 +1,458 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://handshake.cn/hsp/0.2/hsp-message.schema.json",
+  "title": "HSP 0.2 signed message envelope",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "protocol",
+    "protocol_version",
+    "message_id",
+    "handshake_id",
+    "community_id",
+    "type",
+    "sender_endpoint_id",
+    "recipient_endpoint_id",
+    "sequence",
+    "state_version",
+    "idempotency_key",
+    "nonce",
+    "issued_at",
+    "expires_at",
+    "payload",
+    "signature"
+  ],
+  "properties": {
+    "protocol": { "const": "hsp" },
+    "protocol_version": {
+      "type": "string",
+      "pattern": "^0\\.2\\.[0-9]+(?:-[0-9A-Za-z.-]+)?$"
+    },
+    "message_id": { "type": "string", "pattern": "^msg_[A-Za-z0-9_-]{1,120}$" },
+    "handshake_id": { "type": "string", "pattern": "^hs_[A-Za-z0-9_-]{1,120}$" },
+    "community_id": { "$ref": "hsp-common.schema.json#/$defs/entityId" },
+    "type": {
+      "enum": [
+        "CAPABILITY_OFFER",
+        "QUESTION",
+        "CLAIM_RESPONSE",
+        "EVIDENCE_REQUEST",
+        "OWNER_REQUIRED",
+        "CONFLICT_FOUND",
+        "PROPOSAL",
+        "OWNER_DECISION",
+        "REVEAL_RECEIPT",
+        "TERMINATE"
+      ]
+    },
+    "sender_endpoint_id": { "$ref": "hsp-common.schema.json#/$defs/entityId" },
+    "recipient_endpoint_id": { "$ref": "hsp-common.schema.json#/$defs/entityId" },
+    "sequence": { "type": "integer", "minimum": 1 },
+    "state_version": { "type": "integer", "minimum": 0 },
+    "idempotency_key": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{7,127}$"
+    },
+    "nonce": { "type": "string", "pattern": "^[A-Za-z0-9_-]{16,128}$" },
+    "issued_at": { "type": "string", "format": "date-time" },
+    "expires_at": { "type": "string", "format": "date-time" },
+    "expected_status": { "$ref": "hsp-common.schema.json#/$defs/handshakeStatus" },
+    "payload": { "type": "object" },
+    "signature": { "$ref": "hsp-common.schema.json#/$defs/signature" }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "type": { "const": "CAPABILITY_OFFER" } } },
+      "then": { "properties": { "payload": { "$ref": "#/$defs/capabilityOfferPayload" } } }
+    },
+    {
+      "if": { "properties": { "type": { "const": "QUESTION" } } },
+      "then": { "properties": { "payload": { "$ref": "#/$defs/questionPayload" } } }
+    },
+    {
+      "if": { "properties": { "type": { "const": "CLAIM_RESPONSE" } } },
+      "then": { "properties": { "payload": { "$ref": "#/$defs/claimResponsePayload" } } }
+    },
+    {
+      "if": { "properties": { "type": { "const": "EVIDENCE_REQUEST" } } },
+      "then": { "properties": { "payload": { "$ref": "#/$defs/evidenceRequestPayload" } } }
+    },
+    {
+      "if": { "properties": { "type": { "const": "OWNER_REQUIRED" } } },
+      "then": { "properties": { "payload": { "$ref": "#/$defs/ownerRequiredPayload" } } }
+    },
+    {
+      "if": { "properties": { "type": { "const": "CONFLICT_FOUND" } } },
+      "then": { "properties": { "payload": { "$ref": "#/$defs/conflictFoundPayload" } } }
+    },
+    {
+      "if": { "properties": { "type": { "const": "PROPOSAL" } } },
+      "then": { "properties": { "payload": { "$ref": "#/$defs/proposalPayload" } } }
+    },
+    {
+      "if": { "properties": { "type": { "const": "OWNER_DECISION" } } },
+      "then": { "properties": { "payload": { "$ref": "#/$defs/ownerDecisionPayload" } } }
+    },
+    {
+      "if": { "properties": { "type": { "const": "REVEAL_RECEIPT" } } },
+      "then": { "properties": { "payload": { "$ref": "#/$defs/revealReceiptPayload" } } }
+    },
+    {
+      "if": { "properties": { "type": { "const": "TERMINATE" } } },
+      "then": { "properties": { "payload": { "$ref": "#/$defs/terminatePayload" } } }
+    }
+  ],
+  "$defs": {
+    "question": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["question_id", "predicate", "required"],
+      "properties": {
+        "question_id": { "type": "string", "pattern": "^q_[A-Za-z0-9_-]{1,120}$" },
+        "predicate": { "$ref": "hsp-common.schema.json#/$defs/predicate" },
+        "prompt": { "type": "string", "minLength": 1, "maxLength": 500 },
+        "required": { "type": "boolean" }
+      }
+    },
+    "capabilityOfferPayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "scene",
+        "purpose",
+        "answerable_predicates",
+        "non_disclosable_predicates",
+        "supported_evidence",
+        "max_questions_per_round"
+      ],
+      "properties": {
+        "scene": { "$ref": "hsp-common.schema.json#/$defs/scene" },
+        "purpose": { "$ref": "hsp-common.schema.json#/$defs/purpose" },
+        "answerable_predicates": {
+          "type": "array",
+          "maxItems": 128,
+          "uniqueItems": true,
+          "items": { "$ref": "hsp-common.schema.json#/$defs/predicate" }
+        },
+        "non_disclosable_predicates": {
+          "type": "array",
+          "maxItems": 128,
+          "uniqueItems": true,
+          "items": { "$ref": "hsp-common.schema.json#/$defs/predicate" }
+        },
+        "supported_evidence": {
+          "type": "array",
+          "maxItems": 4,
+          "uniqueItems": true,
+          "items": {
+            "enum": ["owner_confirmed", "document_imported", "host_ai_summary", "inferred"]
+          }
+        },
+        "max_questions_per_round": { "type": "integer", "minimum": 1, "maximum": 3 }
+      }
+    },
+    "questionPayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["round", "questions"],
+      "properties": {
+        "round": { "type": "integer", "minimum": 1, "maximum": 6 },
+        "questions": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 3,
+          "items": { "$ref": "#/$defs/question" }
+        }
+      }
+    },
+    "claimResponsePayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "round",
+        "in_reply_to",
+        "unknown_question_ids",
+        "refusals",
+        "owner_required_question_ids",
+        "confidence"
+      ],
+      "properties": {
+        "round": { "type": "integer", "minimum": 1, "maximum": 6 },
+        "in_reply_to": { "type": "string", "pattern": "^msg_[A-Za-z0-9_-]{1,120}$" },
+        "claim_envelope": { "$ref": "claim-envelope.schema.json" },
+        "unknown_question_ids": {
+          "type": "array",
+          "maxItems": 3,
+          "uniqueItems": true,
+          "items": { "type": "string", "pattern": "^q_[A-Za-z0-9_-]{1,120}$" }
+        },
+        "refusals": {
+          "type": "array",
+          "maxItems": 3,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["question_id", "code"],
+            "properties": {
+              "question_id": { "type": "string", "pattern": "^q_[A-Za-z0-9_-]{1,120}$" },
+              "code": {
+                "enum": ["NOT_AUTHORIZED", "OUT_OF_SCOPE", "PROHIBITED", "NO_EVIDENCE"]
+              }
+            }
+          }
+        },
+        "owner_required_question_ids": {
+          "type": "array",
+          "maxItems": 3,
+          "uniqueItems": true,
+          "items": { "type": "string", "pattern": "^q_[A-Za-z0-9_-]{1,120}$" }
+        },
+        "confidence": { "enum": ["high", "medium", "low"] },
+        "stop_recommendation": { "$ref": "hsp-common.schema.json#/$defs/stopCode" }
+      }
+    },
+    "evidenceRequestPayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["round", "claim_ids", "requested_evidence", "rationale"],
+      "properties": {
+        "round": { "type": "integer", "minimum": 1, "maximum": 6 },
+        "claim_ids": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 16,
+          "uniqueItems": true,
+          "items": { "type": "string", "pattern": "^clm_[A-Za-z0-9_-]{1,120}$" }
+        },
+        "requested_evidence": { "enum": ["owner_confirmed", "document_imported"] },
+        "rationale": { "type": "string", "minLength": 1, "maxLength": 500 }
+      }
+    },
+    "ownerRequiredPayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "request_id",
+        "reason",
+        "questions",
+        "requester_endpoint_id",
+        "disclosure_recipient_endpoint_id",
+        "requested_predicates",
+        "retention_until"
+      ],
+      "properties": {
+        "request_id": { "type": "string", "pattern": "^oreq_[A-Za-z0-9_-]{1,120}$" },
+        "reason": { "enum": ["MISSING_FACT", "EXPAND_DISCLOSURE", "COMMITMENT", "FACT_CONFLICT"] },
+        "questions": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 3,
+          "items": { "$ref": "#/$defs/question" }
+        },
+        "requester_endpoint_id": { "$ref": "hsp-common.schema.json#/$defs/entityId" },
+        "disclosure_recipient_endpoint_id": {
+          "$ref": "hsp-common.schema.json#/$defs/entityId"
+        },
+        "requested_predicates": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 16,
+          "uniqueItems": true,
+          "items": { "$ref": "hsp-common.schema.json#/$defs/predicate" }
+        },
+        "retention_until": { "type": "string", "format": "date-time" }
+      }
+    },
+    "conflictFoundPayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["round", "conflicts", "stop_recommendation"],
+      "properties": {
+        "round": { "type": "integer", "minimum": 1, "maximum": 6 },
+        "conflicts": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 16,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "conflict_id",
+              "constraint_id",
+              "claim_ids",
+              "kind",
+              "summary",
+              "confirmed"
+            ],
+            "properties": {
+              "conflict_id": {
+                "type": "string",
+                "pattern": "^conf_[A-Za-z0-9_-]{1,120}$"
+              },
+              "constraint_id": {
+                "type": "string",
+                "pattern": "^con_[A-Za-z0-9_-]{1,120}$"
+              },
+              "claim_ids": {
+                "type": "array",
+                "maxItems": 16,
+                "uniqueItems": true,
+                "items": { "type": "string", "pattern": "^clm_[A-Za-z0-9_-]{1,120}$" }
+              },
+              "kind": { "enum": ["HARD_CONSTRAINT", "CLAIM_CONTRADICTION"] },
+              "summary": { "type": "string", "minLength": 1, "maxLength": 500 },
+              "confirmed": { "type": "boolean" }
+            }
+          }
+        },
+        "stop_recommendation": { "enum": ["HARD_CONFLICT", "NEED_OWNER", "LOW_CONFIDENCE"] }
+      }
+    },
+    "proposalPayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "recommendation",
+        "evidence_claim_ids",
+        "conflict_ids",
+        "unknown_predicates",
+        "summary",
+        "stop_code"
+      ],
+      "properties": {
+        "recommendation": { "enum": ["continue", "decline", "owner_review"] },
+        "evidence_claim_ids": {
+          "type": "array",
+          "maxItems": 64,
+          "uniqueItems": true,
+          "items": { "type": "string", "pattern": "^clm_[A-Za-z0-9_-]{1,120}$" }
+        },
+        "conflict_ids": {
+          "type": "array",
+          "maxItems": 32,
+          "uniqueItems": true,
+          "items": { "type": "string", "pattern": "^conf_[A-Za-z0-9_-]{1,120}$" }
+        },
+        "unknown_predicates": {
+          "type": "array",
+          "maxItems": 64,
+          "uniqueItems": true,
+          "items": { "$ref": "hsp-common.schema.json#/$defs/predicate" }
+        },
+        "summary": { "type": "string", "minLength": 1, "maxLength": 2000 },
+        "stop_code": {
+          "enum": ["SUCCESS_PROPOSAL", "ENOUGH_INFO", "HUMAN_REQUIRED", "LOW_CONFIDENCE"]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "recommendation": { "const": "continue" } },
+            "required": ["recommendation"]
+          },
+          "then": { "properties": { "stop_code": { "const": "SUCCESS_PROPOSAL" } } }
+        },
+        {
+          "if": {
+            "properties": { "stop_code": { "const": "SUCCESS_PROPOSAL" } },
+            "required": ["stop_code"]
+          },
+          "then": { "properties": { "recommendation": { "const": "continue" } } }
+        }
+      ]
+    },
+    "ownerDecisionPayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["decision_id", "decision", "consent_version", "decided_at", "owner_signature"],
+      "properties": {
+        "decision_id": { "type": "string", "pattern": "^dec_[A-Za-z0-9_-]{1,120}$" },
+        "decision": { "enum": ["continue", "decline", "clarify", "terminate"] },
+        "consent_version": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "clarification": { "type": "string", "minLength": 1, "maxLength": 1000 },
+        "decided_at": { "type": "string", "format": "date-time" },
+        "owner_signature": { "type": "string", "minLength": 16, "maxLength": 512 }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "decision": { "const": "clarify" } },
+            "required": ["decision"]
+          },
+          "then": {
+            "properties": {
+              "clarification": { "type": "string", "minLength": 1, "maxLength": 1000 }
+            },
+            "required": ["clarification"]
+          }
+        }
+      ]
+    },
+    "revealReceiptPayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reveal_id",
+        "consent_version",
+        "revealed_items",
+        "revealed_at",
+        "receipt_signature"
+      ],
+      "properties": {
+        "reveal_id": { "type": "string", "pattern": "^reveal_[A-Za-z0-9_-]{1,120}$" },
+        "consent_version": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "revealed_items": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 16,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["field", "digest"],
+            "properties": {
+              "field": { "$ref": "hsp-common.schema.json#/$defs/predicate" },
+              "digest": { "$ref": "hsp-common.schema.json#/$defs/digest" },
+              "value": { "type": "string", "minLength": 1, "maxLength": 500 }
+            }
+          }
+        },
+        "revealed_at": { "type": "string", "format": "date-time" },
+        "receipt_signature": { "$ref": "hsp-common.schema.json#/$defs/signature" }
+      }
+    },
+    "terminatePayload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "stop_code",
+        "final_status",
+        "summary",
+        "known_claim_ids",
+        "unknown_predicates",
+        "retryable",
+        "terminated_at"
+      ],
+      "properties": {
+        "stop_code": { "$ref": "hsp-common.schema.json#/$defs/stopCode" },
+        "final_status": {
+          "enum": ["REJECTED", "NO_MATCH", "CANCELLED", "EXPIRED", "POLICY_BLOCKED", "FAILED"]
+        },
+        "summary": { "type": "string", "minLength": 1, "maxLength": 2000 },
+        "known_claim_ids": {
+          "type": "array",
+          "maxItems": 64,
+          "uniqueItems": true,
+          "items": { "type": "string", "pattern": "^clm_[A-Za-z0-9_-]{1,120}$" }
+        },
+        "unknown_predicates": {
+          "type": "array",
+          "maxItems": 64,
+          "uniqueItems": true,
+          "items": { "$ref": "hsp-common.schema.json#/$defs/predicate" }
+        },
+        "retryable": { "type": "boolean" },
+        "terminated_at": { "type": "string", "format": "date-time" }
+      }
+    }
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "profile": {
+    "schemaVersion": "reference-profile-0.1",
+    "endpointId": "agent_product_alpha",
+    "publicCapsule": {
+      "collaborationGoal": "find a technical cofounder for an AI productivity product",
+      "offers": ["product design", "user research"],
+      "seeks": ["backend engineering", "machine learning"],
+      "availability": "8 hours per week"
+    },
+    "privateMemory": {
+      "rawNotes": "Synthetic private note: do not disclose previous employment concerns.",
+      "contactDetails": "synthetic-private@example.test"
+    },
+    "disclosurePolicy": {
+      "allowedFields": ["collaborationGoal", "offers", "seeks", "availability"]
+    }
+  },
+  "candidate": {
+    "collaborationGoal": "find a product partner for an AI developer tool",
+    "offers": ["backend engineering", "machine learning"],
+    "seeks": ["product design"],
+    "availability": "10 hours per week"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "name": "@handshake/sqlite-store",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "SQLite feasibility adapter for the Handshake application store port.",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build:dependencies": "pnpm --filter @handshake/domain build && pnpm --filter @handshake/application build",
+    "build": "pnpm build:dependencies && tsc -p tsconfig.json",
+    "typecheck": "pnpm build:dependencies && tsc -p tsconfig.test.json",
+    "test": "pnpm build:dependencies && vitest run"
+  },
+  "dependencies": {
+    "@handshake/application": "workspace:*",
+    "@handshake/domain": "workspace:*"
+  }
+}

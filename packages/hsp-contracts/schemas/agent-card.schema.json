@@ -1,0 +1,133 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://handshake.cn/hsp/0.2/agent-card.schema.json",
+  "title": "HSP 0.2 Agent Card",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "card_id",
+    "endpoint_id",
+    "community_ids",
+    "owner_binding",
+    "protocol_versions",
+    "capabilities",
+    "scenes",
+    "online_status",
+    "issued_at",
+    "expires_at",
+    "signature"
+  ],
+  "properties": {
+    "schema_version": { "const": "agent-card-0.2" },
+    "card_id": { "type": "string", "pattern": "^card_[A-Za-z0-9_-]{1,120}$" },
+    "endpoint_id": { "$ref": "hsp-common.schema.json#/$defs/entityId" },
+    "community_ids": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 32,
+      "uniqueItems": true,
+      "items": { "$ref": "hsp-common.schema.json#/$defs/entityId" }
+    },
+    "owner_binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status"],
+      "properties": {
+        "status": { "enum": ["verified", "pending", "suspended"] },
+        "method": { "enum": ["phone", "wechat", "email", "manual"] },
+        "verified_at": { "type": "string", "format": "date-time" }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "status": { "const": "verified" } },
+            "required": ["status"]
+          },
+          "then": {
+            "properties": {
+              "method": { "enum": ["phone", "wechat", "email", "manual"] },
+              "verified_at": { "type": "string", "format": "date-time" }
+            },
+            "required": ["method", "verified_at"]
+          }
+        }
+      ]
+    },
+    "protocol_versions": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 16,
+      "uniqueItems": true,
+      "items": { "$ref": "hsp-common.schema.json#/$defs/protocolVersion" }
+    },
+    "capabilities": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["message_types", "claim_predicates"],
+      "properties": {
+        "message_types": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 10,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "CAPABILITY_OFFER",
+              "QUESTION",
+              "CLAIM_RESPONSE",
+              "EVIDENCE_REQUEST",
+              "OWNER_REQUIRED",
+              "CONFLICT_FOUND",
+              "PROPOSAL",
+              "OWNER_DECISION",
+              "REVEAL_RECEIPT",
+              "TERMINATE"
+            ]
+          }
+        },
+        "claim_predicates": {
+          "type": "array",
+          "maxItems": 128,
+          "uniqueItems": true,
+          "items": { "$ref": "hsp-common.schema.json#/$defs/predicate" }
+        },
+        "features": {
+          "type": "array",
+          "maxItems": 4,
+          "uniqueItems": true,
+          "items": {
+            "enum": ["owner_handoff", "evidence_request", "dual_consent", "contact_reveal"]
+          }
+        }
+      }
+    },
+    "scenes": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 32,
+      "uniqueItems": true,
+      "items": { "$ref": "hsp-common.schema.json#/$defs/scene" }
+    },
+    "public_attributes": {
+      "type": "object",
+      "maxProperties": 32,
+      "propertyNames": { "pattern": "^[a-z][a-z0-9_]{1,63}$" },
+      "additionalProperties": { "type": ["string", "number", "boolean", "null"] }
+    },
+    "online_status": { "enum": ["online", "offline", "degraded"] },
+    "model": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["provider", "model"],
+      "properties": {
+        "provider": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "model": { "type": "string", "minLength": 1, "maxLength": 128 }
+      }
+    },
+    "memory_location": { "enum": ["device", "private_service", "host_managed"] },
+    "issued_at": { "type": "string", "format": "date-time" },
+    "expires_at": { "type": "string", "format": "date-time" },
+    "signature": { "$ref": "hsp-common.schema.json#/$defs/signature" }
+  }
+}

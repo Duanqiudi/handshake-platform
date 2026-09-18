@@ -1,0 +1,115 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://handshake.cn/hsp/0.2/intent-capsule.schema.json",
+  "title": "HSP 0.2 Intent Capsule",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "intent_id",
+    "endpoint_id",
+    "community_id",
+    "scene",
+    "purpose",
+    "mode",
+    "resources",
+    "hard_constraints",
+    "allowed_disclosures",
+    "prohibited_disclosures",
+    "status",
+    "created_at",
+    "expires_at",
+    "signature"
+  ],
+  "properties": {
+    "schema_version": { "const": "intent-capsule-0.2" },
+    "intent_id": { "type": "string", "pattern": "^int_[A-Za-z0-9_-]{1,120}$" },
+    "endpoint_id": { "$ref": "hsp-common.schema.json#/$defs/entityId" },
+    "community_id": { "$ref": "hsp-common.schema.json#/$defs/entityId" },
+    "scene": { "$ref": "hsp-common.schema.json#/$defs/scene" },
+    "purpose": { "$ref": "hsp-common.schema.json#/$defs/purpose" },
+    "mode": { "enum": ["seek", "offer"] },
+    "resources": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 32,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1, "maxLength": 160 }
+    },
+    "hard_constraints": {
+      "type": "array",
+      "maxItems": 32,
+      "items": { "$ref": "#/$defs/constraint" }
+    },
+    "soft_preferences": {
+      "type": "array",
+      "maxItems": 32,
+      "items": { "$ref": "#/$defs/constraint" }
+    },
+    "availability": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "commitment": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "starts_at": { "type": "string", "format": "date-time" },
+        "ends_at": { "type": "string", "format": "date-time" }
+      }
+    },
+    "locations": {
+      "type": "array",
+      "maxItems": 16,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1, "maxLength": 128 }
+    },
+    "languages": {
+      "type": "array",
+      "maxItems": 16,
+      "uniqueItems": true,
+      "items": { "type": "string", "pattern": "^[A-Za-z]{2,3}(?:-[A-Za-z0-9]{2,8})*$" }
+    },
+    "allowed_disclosures": {
+      "type": "array",
+      "maxItems": 128,
+      "uniqueItems": true,
+      "items": { "$ref": "hsp-common.schema.json#/$defs/predicate" }
+    },
+    "prohibited_disclosures": {
+      "type": "array",
+      "maxItems": 128,
+      "uniqueItems": true,
+      "items": { "$ref": "hsp-common.schema.json#/$defs/predicate" }
+    },
+    "status": { "enum": ["active", "paused"] },
+    "created_at": { "type": "string", "format": "date-time" },
+    "expires_at": { "type": "string", "format": "date-time" },
+    "signature": { "$ref": "hsp-common.schema.json#/$defs/signature" }
+  },
+  "$defs": {
+    "constraint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["constraint_id", "predicate", "operator", "value"],
+      "properties": {
+        "constraint_id": {
+          "type": "string",
+          "pattern": "^con_[A-Za-z0-9_-]{1,120}$"
+        },
+        "predicate": { "$ref": "hsp-common.schema.json#/$defs/predicate" },
+        "operator": { "enum": ["eq", "neq", "in", "not_in", "gte", "lte", "overlaps"] },
+        "value": {
+          "oneOf": [
+            { "type": ["string", "number", "boolean", "null"] },
+            {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 64,
+              "uniqueItems": true,
+              "items": { "type": ["string", "number", "boolean", "null"] }
+            },
+            { "$ref": "hsp-common.schema.json#/$defs/claimRange" }
+          ]
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "name": "@handshake/platform-api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "HTTP API and production web host for the Handshake V1 member product.",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build:dependencies": "pnpm --filter @handshake/product-application build && pnpm --filter @handshake/product-sqlite-store build",
+    "build": "pnpm build:dependencies && tsc -p tsconfig.json",
+    "typecheck": "pnpm build:dependencies && tsc -p tsconfig.test.json",
+    "test": "pnpm build:dependencies && vitest run",
+    "start": "node dist/main.js"
+  },
+  "dependencies": {
+    "@handshake/product-application": "workspace:*",
+    "@handshake/product-sqlite-store": "workspace:*"
+  }
+}

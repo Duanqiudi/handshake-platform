@@ -1,0 +1,23 @@
+{
+  "name": "@handshake/application",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Framework-neutral Gateway application use cases and persistence ports.",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build:dependencies": "pnpm --filter @handshake/domain build && pnpm --filter @handshake/hsp-contracts build",
+    "build": "pnpm build:dependencies && tsc -p tsconfig.json",
+    "typecheck": "pnpm build:dependencies && tsc -p tsconfig.test.json",
+    "test": "pnpm build:dependencies && vitest run"
+  },
+  "dependencies": {
+    "@handshake/domain": "workspace:*",
+    "@handshake/hsp-contracts": "workspace:*"
+  }
+}
